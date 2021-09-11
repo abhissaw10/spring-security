@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -22,6 +23,7 @@ import static com.example.securitydemo.ApplicationRole.*;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -34,9 +36,10 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 authorizeRequests()
                 .antMatchers("/","/index.html").permitAll()
                 .antMatchers("/students/**").hasRole(STUDENT.name())
-                .antMatchers(HttpMethod.GET,"/management/**").hasAnyAuthority(COURSE_READ.getPermission(), COURSE_WRITE.getPermission())
-                .antMatchers(HttpMethod.POST,"/management/**").hasAnyAuthority(COURSE_WRITE.getPermission())
-                .antMatchers(HttpMethod.GET,"/management/**").hasAnyRole(ADMIN.name(),NEW_ADMIN.name())
+                .antMatchers(HttpMethod.GET,"/students/**").hasAuthority(STUDENT_READ.name())
+            //    .antMatchers(HttpMethod.GET,"/management/**").hasAnyAuthority(COURSE_WRITE.name(),COURSE_READ.name())
+               // .antMatchers(HttpMethod.POST,"/management/**").hasAuthority(COURSE_WRITE.name())
+                //.antMatchers(HttpMethod.GET,"/management/**").hasAnyRole(ADMIN.name(), NEW_ADMIN.name())
                 .anyRequest()
                 .authenticated()
                 .and().httpBasic();

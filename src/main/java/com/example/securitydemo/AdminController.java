@@ -1,6 +1,7 @@
 package com.example.securitydemo;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ public class AdminController {
     );
 
     @GetMapping("/management/students/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN','NEW_ADMIN')")
     public ResponseEntity<Student> getStudent(@PathVariable("studentId") Integer studentId){
         return ResponseEntity.ok(STUDENTS
                 .stream()
@@ -26,6 +28,7 @@ public class AdminController {
     }
 
     @PostMapping("/management/students")
+    @PreAuthorize("hasAuthority('COURSE_WRITE')")
     public ResponseEntity<Student> getStudent(Student student){
         return ResponseEntity.ok().build();
     }

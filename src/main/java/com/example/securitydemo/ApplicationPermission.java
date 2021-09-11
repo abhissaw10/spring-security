@@ -1,17 +1,8 @@
 package com.example.securitydemo;
 
 public enum ApplicationPermission {
-    STUDENT_READ("student:read"),
-    COURSE_WRITE("course:write"),
-    COURSE_READ("course:read");
+    STUDENT_READ,
+    COURSE_WRITE,
+    COURSE_READ
 
-    private final String permission;
-
-    ApplicationPermission(String permission) {
-        this.permission = permission;
-    }
-
-    public String getPermission(){
-        return permission;
-    }
 }

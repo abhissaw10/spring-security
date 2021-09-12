@@ -1,6 +1,8 @@
 package com.example.securitydemo.security;
 
 import com.example.securitydemo.ApplicationUserDetailsService;
+import com.example.securitydemo.JWTAuthenticationFilter;
+import com.example.securitydemo.JWTTokenVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +13,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-
-import java.util.Arrays;
 
 import static com.example.securitydemo.ApplicationPermission.STUDENT_READ;
 import static com.example.securitydemo.ApplicationRole.*;
@@ -35,8 +33,12 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().
-                authorizeRequests()
+        http.csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(new JWTTokenVerifier(),JWTAuthenticationFilter.class)
+                .authorizeRequests()
                 .antMatchers("/","/index.html").permitAll()
                 .antMatchers("/students/**").hasRole(STUDENT.name())
                 .antMatchers(HttpMethod.GET,"/students/**").hasAuthority(STUDENT_READ.name())
@@ -44,8 +46,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                // .antMatchers(HttpMethod.POST,"/management/**").hasAuthority(COURSE_WRITE.name())
                 //.antMatchers(HttpMethod.GET,"/management/**").hasAnyRole(ADMIN.name(), NEW_ADMIN.name())
                 .anyRequest()
-                .authenticated()
-                .and().formLogin();
+                .authenticated();
     }
 
     /*@Override
